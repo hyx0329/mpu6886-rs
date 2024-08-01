@@ -46,6 +46,7 @@ pub struct Mpu6886<I2C> {
 }
 
 impl<I2C: I2c> Mpu6886<I2C> {
+    #[must_use]
     pub fn new(i2c: I2C) -> Self {
         Self {
             i2c,
@@ -55,6 +56,7 @@ impl<I2C: I2c> Mpu6886<I2C> {
         }
     }
 
+    #[must_use]
     pub fn new_with_addr(i2c: I2C, address: u8) -> Self {
         Self {
             i2c,
