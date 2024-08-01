@@ -110,7 +110,7 @@ impl<I2C: I2c> Mpu6886<I2C> {
 
     pub fn temperature(&mut self) -> Result<f32, Error> {
         let raw_value = self.read_u16(0x41)?;
-        let temperature: f32 = (raw_value as f32) / 326.8 + 25.0;
+        let temperature: f32 = raw_value as i16 as f32 / 326.8 + 25.0;
         Ok(temperature)
     }
 

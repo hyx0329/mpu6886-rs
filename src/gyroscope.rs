@@ -70,18 +70,18 @@ impl<I2C: I2c> Mpu6886<I2C> {
             GyroScaleRange::Range1000Dps => SENSITIVITY / 4.0,
             GyroScaleRange::Range2000Dps => SENSITIVITY / 8.0,
         };
-        let x_real = (x_raw as f32) / factor * PI / 180.0;
-        let y_real = (y_raw as f32) / factor * PI / 180.0;
-        let z_real = (z_raw as f32) / factor * PI / 180.0;
+        let x_real = x_raw as i16 as f32 / factor * PI / 180.0;
+        let y_real = y_raw as i16 as f32 / factor * PI / 180.0;
+        let z_real = z_raw as i16 as f32 / factor * PI / 180.0;
         Ok((x_real, y_real, z_real))
     }
 
-    pub fn gyro_raw(&mut self) -> Result<(u16, u16, u16), Error> {
+    pub fn gyro_raw(&mut self) -> Result<(i16, i16, i16), Error> {
         let mut xyz_buf: [u8; 6] = [0; 6];
         self.read_buf(0x43, &mut xyz_buf)?;
         let x_raw = (xyz_buf[0] as u16) << 8 | (xyz_buf[1] as u16);
         let y_raw = (xyz_buf[2] as u16) << 8 | (xyz_buf[3] as u16);
         let z_raw = (xyz_buf[4] as u16) << 8 | (xyz_buf[5] as u16);
-        Ok((x_raw, y_raw, z_raw))
+        Ok((x_raw as i16, y_raw as i16, z_raw as i16))
     }
 }

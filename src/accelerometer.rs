@@ -63,18 +63,18 @@ impl<I2C: I2c> Mpu6886<I2C> {
             AccelScaleRange::Range8g => 4096.0,
             AccelScaleRange::Range16g => 2048.0,
         };
-        let x_real = (x_raw as f32) / factor * GRAVITY;
-        let y_real = (y_raw as f32) / factor * GRAVITY;
-        let z_real = (z_raw as f32) / factor * GRAVITY;
+        let x_real = x_raw as i16 as f32 / factor * GRAVITY;
+        let y_real = y_raw as i16 as f32 / factor * GRAVITY;
+        let z_real = z_raw as i16 as f32 / factor * GRAVITY;
         Ok((x_real, y_real, z_real))
     }
 
-    pub fn acceleration_raw(&mut self) -> Result<(u16, u16, u16), Error> {
+    pub fn acceleration_raw(&mut self) -> Result<(i16, i16, i16), Error> {
         let mut xyz_buf: [u8; 6] = [0; 6];
         self.read_buf(0x3B, &mut xyz_buf)?;
         let x_raw = (xyz_buf[0] as u16) << 8 | (xyz_buf[1] as u16);
         let y_raw = (xyz_buf[2] as u16) << 8 | (xyz_buf[3] as u16);
         let z_raw = (xyz_buf[4] as u16) << 8 | (xyz_buf[5] as u16);
-        Ok((x_raw, y_raw, z_raw))
+        Ok((x_raw as i16, y_raw as i16, z_raw as i16))
     }
 }
