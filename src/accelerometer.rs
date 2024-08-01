@@ -30,13 +30,8 @@ impl<I2C: I2c> Mpu6886<I2C> {
 
     pub fn set_accel_scale_range(&mut self, value: AccelScaleRange) -> Result<(), Error> {
         let original_value = self.read_u8(0x1C)?;
-        let choice_value = match value {
-            AccelScaleRange::Range2g => 0,
-            AccelScaleRange::Range4g => 1,
-            AccelScaleRange::Range8g => 2,
-            AccelScaleRange::Range16g => 3,
-        };
-        let reg_value = (original_value & 0b11100111) | choice_value;
+        let choice_value = value as u8;
+        let reg_value = (original_value & 0b11100111) | choice_value << 3;
         self.write_u8(0x1C, reg_value)?;
         self.acc_range = value;
         Ok(())

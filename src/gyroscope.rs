@@ -25,13 +25,8 @@ impl<I2C: I2c> Mpu6886<I2C> {
 
     pub fn set_gyro_scale_range(&mut self, value: GyroScaleRange) -> Result<(), Error> {
         let original_value = self.read_u8(0x1B)?;
-        let choice_value = match value {
-            GyroScaleRange::Range250Dps => 0,
-            GyroScaleRange::Range500Dps => 1,
-            GyroScaleRange::Range1000Dps => 2,
-            GyroScaleRange::Range2000Dps => 3,
-        };
-        let reg_value = (original_value & 0b11100111) | choice_value;
+        let choice_value = value as u8;
+        let reg_value = (original_value & 0b11100111) | choice_value << 3;
         self.write_u8(0x1B, reg_value)?;
         self.gyro_range = value;
         Ok(())
@@ -43,7 +38,7 @@ impl<I2C: I2c> Mpu6886<I2C> {
         self.write_u8(0x6B, new_value)
     }
 
-    pub fn gyro_active(&mut self) -> Result<(), Error> {
+    pub fn gyro_activate(&mut self) -> Result<(), Error> {
         let original_value = self.read_u8(0x6B)?;
         let new_value = original_value & 0b11101111;
         self.write_u8(0x6B, new_value)
