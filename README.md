@@ -14,6 +14,8 @@ What's implemented:
 - enable/disable accel/gyro/temperature
 - use internal 20MHz clock or best clock
 
+MPU6886 also supports i2c address 0x69, but this is not implemented in the driver, for simplicity.
+
 ## Example
 
 minimum:
