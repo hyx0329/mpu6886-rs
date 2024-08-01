@@ -57,6 +57,7 @@ impl<I2C: I2c> Mpu6886<I2C> {
         self.i2c
     }
 
+    /// Checks chip version and load current state.
     pub fn init(&mut self) -> Result<(), Error> {
         let chip_id = self.read_u8(0x75)?;
         if chip_id != 0x19 {
@@ -68,8 +69,13 @@ impl<I2C: I2c> Mpu6886<I2C> {
         }
     }
 
+    /// Resets the sensor to initial state.
     pub fn reset(&mut self) -> Result<(), Error> {
-        self.write_u8(0x6B, 0b10000000)
+        self.write_u8(0x6B, 0b10000000)?;
+        // also reset internal state
+        self.acc_range = AccelScaleRange::Range2g;
+        self.gyro_range = GyroScaleRange::Range250Dps;
+        Ok(())
     }
 
     pub fn sleep(&mut self) -> Result<(), Error> {
@@ -78,10 +84,19 @@ impl<I2C: I2c> Mpu6886<I2C> {
         self.write_u8(0x6B, new_value)
     }
 
+    /// Wake the inertial sensor up.
+    ///
+    /// The sensor is in sleep mode by default. For lazy people who don't
+    /// want to check sensor's version, this method also loads current range
+    /// states from chip so the values are calculated correctly.
     pub fn wake(&mut self) -> Result<(), Error> {
         let original_value = self.read_u8(0x6B)?;
         let new_value = original_value & 0b10111111;
-        self.write_u8(0x6B, new_value)
+        self.write_u8(0x6B, new_value)?;
+        // also load state from chip
+        self.acc_range = self.get_accel_scale_range()?;
+        self.gyro_range = self.get_gyro_scale_range()?;
+        Ok(())
     }
 
     pub fn use_best_clock(&mut self) -> Result<(), Error> {
