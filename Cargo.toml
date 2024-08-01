@@ -1,0 +1,11 @@
+[package]
+name = "mpu6886"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+defmt = { version = "0.3.8", optional = true }
+embedded-hal = "1.0.0"
+
+[features]
+defmt = ["dep:defmt", "embedded-hal/defmt-03"]
