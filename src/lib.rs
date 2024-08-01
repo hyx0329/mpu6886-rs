@@ -10,7 +10,7 @@ use gyroscope::GyroScaleRange;
 
 use embedded_hal::i2c::{Error as I2cError, ErrorKind as I2cErrorKind, I2c};
 
-const MPU6886_ADDR: u8 = 0x68;
+pub const MPU6886_DEFAULT_ADDR: u8 = 0x68;
 
 /// MPU6886 error type.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -40,6 +40,7 @@ impl embedded_hal::digital::Error for Error {
 #[derive(Debug)]
 pub struct Mpu6886<I2C> {
     i2c: I2C,
+    address: u8,
     acc_range: AccelScaleRange,
     gyro_range: GyroScaleRange,
 }
@@ -47,7 +48,17 @@ pub struct Mpu6886<I2C> {
 impl<I2C: I2c> Mpu6886<I2C> {
     pub fn new(i2c: I2C) -> Self {
         Self {
-            i2c: i2c,
+            i2c,
+            address: MPU6886_DEFAULT_ADDR,
+            acc_range: AccelScaleRange::Range2g,
+            gyro_range: GyroScaleRange::Range250Dps,
+        }
+    }
+
+    pub fn new_with_addr(i2c: I2C, address: u8) -> Self {
+        Self {
+            i2c,
+            address,
             acc_range: AccelScaleRange::Range2g,
             gyro_range: GyroScaleRange::Range250Dps,
         }
@@ -133,14 +144,14 @@ impl<I2C: I2c> Mpu6886<I2C> {
     fn read_u8(&mut self, reg: u8) -> Result<u8, Error> {
         let mut buf: [u8; 1] = [0; 1];
 
-        match self.i2c.write_read(MPU6886_ADDR, &[reg], &mut buf) {
+        match self.i2c.write_read(self.address, &[reg], &mut buf) {
             Ok(_) => Ok(buf[0]),
             Err(e) => Err(e.into()),
         }
     }
 
     fn write_u8(&mut self, reg: u8, value: u8) -> Result<(), Error> {
-        Ok(self.i2c.write(MPU6886_ADDR, &[reg, value])?)
+        Ok(self.i2c.write(self.address, &[reg, value])?)
     }
 
     fn read_u16(&mut self, reg: u8) -> Result<u16, Error> {
@@ -152,6 +163,6 @@ impl<I2C: I2c> Mpu6886<I2C> {
 
     #[inline]
     fn read_buf(&mut self, reg: u8, buf: &mut [u8]) -> Result<(), Error> {
-        Ok(self.i2c.write_read(MPU6886_ADDR, &[reg], buf)?)
+        Ok(self.i2c.write_read(self.address, &[reg], buf)?)
     }
 }
