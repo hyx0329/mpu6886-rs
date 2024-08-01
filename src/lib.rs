@@ -38,13 +38,13 @@ impl embedded_hal::digital::Error for Error {
 }
 
 #[derive(Debug)]
-pub struct Mpu6866<I2C, const MPU6886_ADDR: u8> {
+pub struct Mpu6886<I2C, const MPU6886_ADDR: u8> {
     i2c: I2C,
     acc_range: AccelScaleRange,
     gyro_range: GyroScaleRange,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6866<I2C, MPU6886_ADDR> {
+impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
     pub fn new(i2c: I2C) -> Self {
         Self {
             i2c: i2c,

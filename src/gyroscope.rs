@@ -1,6 +1,6 @@
 //! Gyroscope implementation.
 
-use crate::{Error, Mpu6866, I2c};
+use crate::{Error, Mpu6886, I2c};
 use core::f32::consts::PI;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -11,7 +11,7 @@ pub enum GyroScaleRange {
     Range2000Dps,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6866<I2C, MPU6886_ADDR> {
+impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
     pub fn get_gyro_scale_range(&mut self) -> Result<GyroScaleRange, Error> {
         let raw_value = self.read_u8(0x1B)?;
         let selection = (raw_value & 0b00011000) >> 3;

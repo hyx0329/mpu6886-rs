@@ -1,6 +1,6 @@
 //! Accelerometer interface implementation.
 
-use crate::{Error, Mpu6866, I2c};
+use crate::{Error, Mpu6886, I2c};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AccelScaleRange {
@@ -10,7 +10,7 @@ pub enum AccelScaleRange {
     Range16g,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6866<I2C, MPU6886_ADDR> {
+impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
     pub fn get_accel_scale_range(&mut self) -> Result<AccelScaleRange, Error> {
         let raw_value = self.read_u8(0x1C)?;
         let selection = (raw_value & 0b00011000) >> 3;
