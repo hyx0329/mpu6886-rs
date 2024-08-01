@@ -84,7 +84,7 @@ impl<I2C: I2c> Mpu6886<I2C> {
         self.write_u8(0x6B, new_value)
     }
 
-    /// Wake the inertial sensor up.
+    /// Wakes the inertial sensor up.
     ///
     /// The sensor is in sleep mode by default. For lazy people who don't
     /// want to check sensor's version, this method also loads current range
