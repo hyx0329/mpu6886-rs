@@ -10,7 +10,7 @@ use gyroscope::GyroScaleRange;
 
 use embedded_hal::i2c::{Error as I2cError, ErrorKind as I2cErrorKind, I2c};
 
-pub const MPU6886_DEFAULT_ADDR: u8 = 0x68;
+const MPU6886_ADDR: u8 = 0x68;
 
 /// MPU6886 error type.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -38,13 +38,13 @@ impl embedded_hal::digital::Error for Error {
 }
 
 #[derive(Debug)]
-pub struct Mpu6886<I2C, const MPU6886_ADDR: u8> {
+pub struct Mpu6886<I2C> {
     i2c: I2C,
     acc_range: AccelScaleRange,
     gyro_range: GyroScaleRange,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
+impl<I2C: I2c> Mpu6886<I2C> {
     pub fn new(i2c: I2C) -> Self {
         Self {
             i2c: i2c,

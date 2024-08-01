@@ -1,6 +1,6 @@
 //! Accelerometer interface implementation.
 
-use crate::{Error, Mpu6886, I2c};
+use crate::{Error, I2c, Mpu6886};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AccelScaleRange {
@@ -10,7 +10,13 @@ pub enum AccelScaleRange {
     Range16g,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
+// #[repr(u8)]
+// #[derive(Debug, Clone, Copy, PartialEq)]
+// pub enum AccelRate {
+
+// }
+
+impl<I2C: I2c> Mpu6886<I2C> {
     pub fn get_accel_scale_range(&mut self) -> Result<AccelScaleRange, Error> {
         let raw_value = self.read_u8(0x1C)?;
         let selection = (raw_value & 0b00011000) >> 3;
@@ -65,6 +71,15 @@ impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
         let x_real = (x_raw as f32) / factor * GRAVITY;
         let y_real = (y_raw as f32) / factor * GRAVITY;
         let z_real = (z_raw as f32) / factor * GRAVITY;
-        Ok((x_real,y_real,z_real))
+        Ok((x_real, y_real, z_real))
+    }
+
+    pub fn acceleration_raw(&mut self) -> Result<(u16, u16, u16), Error> {
+        let mut xyz_buf: [u8; 6] = [0; 6];
+        self.read_buf(0x3B, &mut xyz_buf)?;
+        let x_raw = (xyz_buf[0] as u16) << 8 | (xyz_buf[1] as u16);
+        let y_raw = (xyz_buf[2] as u16) << 8 | (xyz_buf[3] as u16);
+        let z_raw = (xyz_buf[4] as u16) << 8 | (xyz_buf[5] as u16);
+        Ok((x_raw, y_raw, z_raw))
     }
 }

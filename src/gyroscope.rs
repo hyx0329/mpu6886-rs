@@ -1,6 +1,6 @@
 //! Gyroscope implementation.
 
-use crate::{Error, Mpu6886, I2c};
+use crate::{Error, I2c, Mpu6886};
 use core::f32::consts::PI;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -11,7 +11,7 @@ pub enum GyroScaleRange {
     Range2000Dps,
 }
 
-impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
+impl<I2C: I2c> Mpu6886<I2C> {
     pub fn get_gyro_scale_range(&mut self) -> Result<GyroScaleRange, Error> {
         let raw_value = self.read_u8(0x1B)?;
         let selection = (raw_value & 0b00011000) >> 3;
@@ -78,6 +78,15 @@ impl<I2C: I2c, const MPU6886_ADDR: u8> Mpu6886<I2C, MPU6886_ADDR> {
         let x_real = (x_raw as f32) / factor * PI / 180.0;
         let y_real = (y_raw as f32) / factor * PI / 180.0;
         let z_real = (z_raw as f32) / factor * PI / 180.0;
-        Ok((x_real,y_real,z_real))
+        Ok((x_real, y_real, z_real))
+    }
+
+    pub fn gyro_raw(&mut self) -> Result<(u16, u16, u16), Error> {
+        let mut xyz_buf: [u8; 6] = [0; 6];
+        self.read_buf(0x43, &mut xyz_buf)?;
+        let x_raw = (xyz_buf[0] as u16) << 8 | (xyz_buf[1] as u16);
+        let y_raw = (xyz_buf[2] as u16) << 8 | (xyz_buf[3] as u16);
+        let z_raw = (xyz_buf[4] as u16) << 8 | (xyz_buf[5] as u16);
+        Ok((x_raw, y_raw, z_raw))
     }
 }
