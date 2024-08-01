@@ -9,3 +9,38 @@ What's implemented:
 - set/get accelerometer rate
 - read accelerometer
 - read temperature
+- wake
+- sleep
+- enable/disable accel/gyro/temperature
+- use internal 20MHz clock or best clock
+
+## Example
+
+minimum:
+
+```rust
+use mpu6886::Mpu6886;
+
+let mut sensor = Mpu6886::new(i2c);
+let _ = sensor.wake();
+gyro = sensor.gyro().unwrap();
+acc = sensor.acceleration().unwrap();
+```
+
+proper:
+
+```rust
+use mpu6886::{Mpu6886, Error};
+
+let mut sensor = Mpu6886::new(i2c);
+match sensor.init() {
+    Ok(_) => {},
+    Err(e) => match e {
+        Error::UnknownChip(chip_id) => panic!("Unknown chip found, ID: {}", chip_id),
+        _ => panic!("Communication error!"),
+    },
+};
+let _ = sensor.wake();
+gyro = sensor.gyro().unwrap();
+acc = sensor.acceleration().unwrap();
+```
