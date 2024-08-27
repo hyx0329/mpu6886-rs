@@ -20,7 +20,7 @@ MPU6886 also supports i2c address 0x69, use [`Mpu6886::new_with_addr`] for that.
 
 minimum:
 
-```rust
+```rust,ignore
 use mpu6886::Mpu6886;
 
 let mut sensor = Mpu6886::new(i2c);
@@ -31,7 +31,7 @@ acc = sensor.acceleration().unwrap();
 
 proper:
 
-```rust
+```rust,ignore
 use mpu6886::{Mpu6886, Error};
 
 let mut sensor = Mpu6886::new(i2c);
